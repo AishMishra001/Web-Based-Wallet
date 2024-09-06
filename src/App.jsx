@@ -14,10 +14,9 @@ function App() {
      }}>
         Create Seed Phase 
      </button>
-     <input type="text" value={mnemonic}></input>
+     <input type="text" value={mnemonic} style={{width: '1000px' , height : '100px' , padding : '10px'}}></input>
     </>
   )
 }
-console.log(mnemonic) ; 
 
 export default App
