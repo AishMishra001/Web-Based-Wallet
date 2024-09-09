@@ -1,3 +1,15 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+
+.handjet{
+  font-family: "Handjet", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 200 ;
+  font-style: normal;
+  font-variation-settings:
+    "ELGR" 1,
+    "ELSH" 2;
+}
