@@ -3,11 +3,11 @@ import { derivePath } from "ed25519-hd-key";
 import { Keypair } from "@solana/web3.js";
 import nacl from "tweetnacl";
 import { useState } from "react";
-import './components.css';
+import './components.css'; 
 
 const SolanaWallet = ({ mnemonic }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [wallets, setWallets] = useState([]);
+  const [wallets, setWallets] = useState([]); // Store an array of { index, publicKey, privateKey }
 
   const createWallet = () => {
     const seed = mnemonicToSeedSync(mnemonic);
@@ -19,12 +19,15 @@ const SolanaWallet = ({ mnemonic }) => {
     const newWallet = {
       index: currentIndex,
       publicKey: keypair.publicKey.toBase58(),
-      privateKey: Buffer.from(keypair.secretKey).toString("hex"),
-      key: currentIndex // Unique key for animation trigger
+      privateKey: Buffer.from(keypair.secretKey).toString("hex"), // Convert secretKey to hex
     };
 
     setWallets([...wallets, newWallet]);
     setCurrentIndex(currentIndex + 1);
+  };
+
+  const deleteWallet = (index) => {
+    setWallets(wallets.filter(wallet => wallet.index !== index));
   };
 
   return (
@@ -41,19 +44,22 @@ const SolanaWallet = ({ mnemonic }) => {
 
       {/* Display each wallet with its index, public key, and private key */}
       {wallets.map((wallet) => (
-        <div
-          key={wallet.key} // Ensure each wallet entry is unique
-          className="text-white pt-2 border-gray-400 border-2 rounded-2xl mt-4 w-full wallet-entry"
-        >
+        <div key={wallet.index} className="text-white pt-2 border-gray-400 border-2 rounded-2xl mt-4 w-full relative">
+          <button
+            onClick={() => deleteWallet(wallet.index)}
+            className="absolute top-2 right-2 text-red-500 hover:text-red-700 transition-colors"
+          >
+            &#x1F5D1; {/* Trash icon */}
+          </button>
           <p className="Acme text-3xl pl-4 font-thin pb-2">Wallet {wallet.index + 1}:</p>
           <div className="bg-gray-800 pl-4 rounded-xl py-2">
             <div className="flex flex-col">
               <p className="text-lg font-semibold">Public Key:</p>
-              <p className="break-all">{wallet.publicKey}</p>
+              <p className="break-all">{wallet.publicKey}</p> {/* Ensure keys don't overflow */}
             </div>
             <div className="flex flex-col mt-2">
               <p className="text-lg font-semibold">Private Key:</p>
-              <p className="break-all">{wallet.privateKey}</p>
+              <p className="break-all">{wallet.privateKey}</p> {/* Ensure keys wrap correctly */}
             </div>
           </div>
         </div>
