@@ -18,3 +18,10 @@
 .wallet-entry {
   animation: fadeIn 0.5s ease-out;
 }
+
+.truncate {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}

@@ -4,10 +4,14 @@ import { Keypair } from "@solana/web3.js";
 import nacl from "tweetnacl";
 import { useState } from "react";
 import './components.css'; 
+import { PiEyeClosedBold } from "react-icons/pi";
+import { FaRegEye, FaRegCopy } from "react-icons/fa";
+import { FaTrash } from "react-icons/fa";
 
 const SolanaWallet = ({ mnemonic }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [wallets, setWallets] = useState([]); // Store an array of { index, publicKey, privateKey }
+  const [showPrivateKey, setShowPrivateKey] = useState({}); // To manage visibility of private keys
 
   const createWallet = () => {
     const seed = mnemonicToSeedSync(mnemonic);
@@ -30,6 +34,23 @@ const SolanaWallet = ({ mnemonic }) => {
     setWallets(wallets.filter(wallet => wallet.index !== index));
   };
 
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text)
+      .then(() => {
+        alert("Copied to clipboard!");
+      })
+      .catch(err => {
+        console.error("Failed to copy text: ", err);
+      });
+  };
+
+  const togglePrivateKeyVisibility = (index) => {
+    setShowPrivateKey(prev => ({
+      ...prev,
+      [index]: !prev[index]
+    }));
+  };
+
   return (
     <div className="w-full">
       <button
@@ -49,17 +70,41 @@ const SolanaWallet = ({ mnemonic }) => {
             onClick={() => deleteWallet(wallet.index)}
             className="absolute top-2 right-2 text-red-500 hover:text-red-700 transition-colors"
           >
-            &#x1F5D1; {/* Trash icon */}
+             <FaTrash />
           </button>
           <p className="Acme text-3xl pl-4 font-thin pb-2">Wallet {wallet.index + 1}:</p>
           <div className="bg-gray-800 pl-4 rounded-xl py-2">
             <div className="flex flex-col">
-              <p className="text-lg font-semibold">Public Key:</p>
+              <div className="flex items-center">
+                <p className="text-lg font-semibold mr-2">Public Key :</p>
+                <button
+                  onClick={() => copyToClipboard(wallet.publicKey)}
+                  className="text-blue-500 hover:text-blue-700"
+                >
+                  <FaRegCopy />
+                </button>
+              </div>
               <p className="break-all">{wallet.publicKey}</p> {/* Ensure keys don't overflow */}
             </div>
             <div className="flex flex-col mt-2">
-              <p className="text-lg font-semibold">Private Key:</p>
-              <p className="break-all">{wallet.privateKey}</p> {/* Ensure keys wrap correctly */}
+              <div className="flex items-center">
+                <p className="text-lg font-semibold mr-2">Private Key :</p>
+                <button
+                  onClick={() => copyToClipboard(wallet.privateKey)}
+                  className="text-blue-500 hover:text-blue-700 mr-2"
+                >
+                  <FaRegCopy />
+                </button>
+                <button
+                  onClick={() => togglePrivateKeyVisibility(wallet.index)}
+                  className="text-yellow-500 hover:text-yellow-700"
+                >
+                  {showPrivateKey[wallet.index] ? <FaRegEye /> : <PiEyeClosedBold />} {/* Eye icon */}
+                </button>
+              </div>
+              <p className={`break-all ${showPrivateKey[wallet.index] ? '' : 'truncate'} max-w-full`}>
+                {showPrivateKey[wallet.index] ? wallet.privateKey : '•'.repeat(wallet.privateKey.length)}
+              </p>
             </div>
           </div>
         </div>
